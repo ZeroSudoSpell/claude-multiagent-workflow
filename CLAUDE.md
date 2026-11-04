@@ -13,7 +13,10 @@ are changing how the team works.
 
 ### Commands
 
-Agents run these exact commands. Keep them accurate.
+Agents run these exact commands. Keep them accurate. Implementers run them
+from inside their own worktree, so each command must test the code in the
+directory it runs from, not an installed copy. For example, with a Python
+`src/` layout and an editable install, use `PYTHONPATH=src python3 -m pytest`.
 
 | Purpose | Command |
 |---|---|

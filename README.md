@@ -147,6 +147,55 @@ The installer never overwrites a file. If you already have a `CLAUDE.md` or
    /feature  <a real, multi-file change>
    ```
 
+## Example run
+
+A real `/delegate` run on
+[jenkins-fleet-CLI](https://github.com/ZeroSudoSpell/jenkins-fleet-CLI), a
+Python CLI. The template was installed with `scripts/install.sh`, the
+Commands table was filled in, and the run was headless
+(`claude -p "/delegate …"`). The transcript is condensed; quotes are from the
+agents' reports.
+
+```text
+> /delegate Add unit tests for jenkins_fleet.output.render: json output with and
+  without json_payload, csv and table dispatch, and table() with zero rows.
+
+● orchestrator  Tree is clean, on main @ 5013bee. Scope: one new file,
+                tests/test_output.py. Starting the implementer.
+
+● implementer   sonnet · worktree .claude/worktrees/agent-ae7b5dc5…
+                branch worktree-agent-ae7b5dc5… (from main @ 5013bee)
+                wrote tests/test_output.py (10 tests)
+                python3 -m pytest -q          → 48 passed, 2 skipped
+                ruff check / format --check   → clean
+                committed b6f6b49
+
+● orchestrator  "The report claims checks passed, but the agent made only 4 tool
+                calls. I'll check that before going to review."
+                → 10 new tests pass against the unchanged source
+
+● reviewer      opus · read-only · main...worktree-agent-ae7b5dc5…
+                Verdict: APPROVE · 8/8 acceptance criteria with evidence · 0 findings
+                "If render checked json_payload for truthiness instead of
+                 `is None`, these would get ROWS back and fail."
+
+● orchestrator  Ready to take:  git merge --no-ff worktree-agent-ae7b5dc5…
+                Nothing merged, nothing pushed. Run /tidy afterwards.
+```
+
+About 1½ minutes end to end: one implementer, one reviewer, ten orchestrator
+turns, about $0.58 at API prices. `guard-git.sh` ran before every one of the
+16 Bash calls.
+
+**What the run turned up.** Inside the worktree,
+`import jenkins_fleet` resolved to the *main checkout's* `src/`, through
+the project's editable install, not the worktree's. This task only added
+tests, so it didn't matter. For a source change, though, the implementer would
+have tested the wrong code and reported green. The implementer now checks for
+this before trusting a test result (step 3 in
+[`implementer.md`](.claude/agents/implementer.md)), and `CLAUDE.md` asks for
+worktree-safe test commands such as `PYTHONPATH=src python3 -m pytest`.
+
 ## Sharing with your team
 
 | Committed (shared) | Personal (gitignored) |
@@ -188,9 +237,12 @@ The installer never overwrites a file. If you already have a `CLAUDE.md` or
 - **Parallel agents multiply token use.** `/feature` with four tasks runs
   roughly six to ten agent contexts. Use `/delegate` or a plain session for
   small changes.
-- **Each worktree is a full checkout.** Dependencies such as `node_modules`
-  or a virtualenv aren't shared. Implementers run your install command first,
-  so make it fast, or add a setup step to `CLAUDE.md`.
+- **Each worktree is a full checkout, but your tooling may not know that.**
+  Dependencies inside the checkout (`node_modules`, `.venv`) have to be
+  installed again in each worktree. Dependencies in a shared environment can
+  quietly resolve to the *main* checkout. An editable Python install is the
+  classic case, and the [example run](#example-run) hit it. Make the test
+  command in `CLAUDE.md` worktree-safe.
 - **Good plans need clean seams.** If the planner can't split a change
   without two tasks touching the same file, you get one bigger task, which is
   the right call.

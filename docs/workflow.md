@@ -141,4 +141,5 @@ are copied into every new worktree, so tests work there too.
 | Two fix rounds didn't satisfy the reviewer | Escalates with the outstanding findings |
 | Merge conflict between task branches | Stops; shows files and the tasks that touched them |
 | Checks fail after a merge | Reports which wave broke them; doesn't push on |
+| Tests in a worktree import the main checkout's code (editable install) | Implementer checks the import path before trusting results; use a worktree-safe test command in `CLAUDE.md` |
 | An agent tries `git push --force`, `reset --hard` and the like | `guard-git.sh` blocks it; the agent has to ask you |

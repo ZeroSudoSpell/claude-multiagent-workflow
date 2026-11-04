@@ -33,13 +33,21 @@ same time. The orchestrator gave you one task from a plan.
 
 1. Run `git rev-parse --abbrev-ref HEAD` and `pwd` and note them. You will
    report them.
-2. Read `CLAUDE.md` and the files in your task's scope. A new worktree has
-   no installed dependencies: if the project needs them for tests, run the
-   install command from `CLAUDE.md` first.
-3. Implement the change and its tests.
-4. Run the project's checks. Fix what fails.
-5. `git add` the files in scope and commit.
-6. Return the report below.
+2. Read `CLAUDE.md` and the files in your task's scope.
+3. **Make sure the checks test *this worktree's* code.** Tooling often
+   resolves the project from the main checkout instead: a Python editable
+   install (`pip install -e`), a globally linked npm package, a shared
+   virtualenv. Check it before trusting a test result. For example,
+   `python3 -c 'import <pkg>; print(<pkg>.__file__)'` must print a path
+   inside your worktree. If it doesn't, use the worktree-safe command from
+   `CLAUDE.md`, or prefix the command with `PYTHONPATH=src` for a Python `src/`
+   layout. If dependencies live *inside* the checkout (`node_modules`,
+   `.venv`), install them here. Never reinstall into a *shared* environment
+   from a worktree. That would point every other checkout at your branch.
+4. Implement the change and its tests.
+5. Run the project's checks. Fix what fails.
+6. `git add` the files in scope and commit.
+7. Return the report below.
 
 ## Report format
 
