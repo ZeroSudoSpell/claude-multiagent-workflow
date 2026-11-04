@@ -1,0 +1,6 @@
+# Gitignored files to copy into every new worktree (same syntax as .gitignore).
+# Only files that match here AND are gitignored are copied. Without this,
+# agents in a fresh worktree have no local config and tests that need it fail.
+.env
+.env.local
+.env.test

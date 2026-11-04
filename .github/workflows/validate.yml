@@ -1,0 +1,22 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Agents, skills and settings are well formed
+        run: python3 scripts/validate.py
+      - name: Git guard hook blocks what it should
+        run: bash tests/test_guard_git.sh
+      - name: Installer works on a fresh repo
+        run: bash tests/test_install.sh
+      - name: Shell scripts pass shellcheck
+        run: shellcheck .claude/hooks/*.sh scripts/*.sh tests/*.sh

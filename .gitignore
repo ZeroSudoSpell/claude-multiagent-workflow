@@ -1,0 +1,10 @@
+# Claude Code: worktrees created by `claude -w` and isolation: worktree agents
+.claude/worktrees/
+# Personal overrides; .claude/settings.json is the shared, committed one
+.claude/settings.local.json
+CLAUDE.local.md
+
+.env
+.env.*
+__pycache__/
+.DS_Store
